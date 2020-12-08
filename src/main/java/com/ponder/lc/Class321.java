@@ -88,6 +88,7 @@ public class Class321 {
      * @return
      */
     private int getMaxIndex(int[] arr,int index){
+        if (index>=arr.length)return -1;
         int temp=arr[index];
         for (int i = index;i<arr.length;i++){
             if (temp<arr[i]){
@@ -109,36 +110,74 @@ public class Class321 {
     private void un(int[] nums1, int[] nums2, int k,int[] result,int start1,int start2){
         int indexA = getMaxIndex(nums1, start1);
         int indexB = getMaxIndex(nums2, start2);
-        if (nums1[indexA]>=nums2[indexB]){
+        if ((indexA!=-1)&&(indexB==-1 || nums1[indexA]>nums2[indexB])){
             if (nums1.length-indexA+nums2.length-start2>=0){
-                result[result.length-k]=nums1[indexA];
-                un(nums1,nums2,k-1,result,indexA,start2);
+                if (k>0){
+                    result[result.length-k]=nums1[indexA];
+                    un(nums1,nums2,k-1,result,indexA+1,start2);
+                }
             }else {
                 int[] nums11 = Arrays.copyOf(nums1, nums1.length);
                 nums11[indexA] = -1;
                 un(nums11,nums2,k,result,start1,start2);
             }
-        }
-        if ((nums1[indexA]<=nums2[indexB])){
+        }else if ((indexB!=-1)&&(indexA==-1||(nums1[indexA]<nums2[indexB]))){
             if (nums1.length-indexA+nums2.length-start1>=0){
-                result[result.length-k]=nums2[indexB];
-                un(nums1,nums2,k-1,result,start1,indexB);
+                if (k>0){
+                    result[result.length-k]=nums2[indexB];
+                    un(nums1,nums2,k-1,result,start1,indexB+1);
+                }
             }else {
                 int[] nums22 = Arrays.copyOf(nums2,nums2.length);
                 nums22[indexB] = -1;
                 un(nums1,nums22,k,result,start1,start2);
             }
+        }else{
+
         }
+    }
+
+    public void test1(){
+        int[] nums1 = new int[]{3, 4, 6, 5};
+        int[] nums2 = new int[]{9, 1, 2, 5, 8, 3};
+        int[] result = new int[5];
+        try {
+            un(nums1,nums2,5,result,0,0);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        System.out.println(Arrays.toString(result));
+    }
+
+    private void test2(){
+        int[] nums1 = new int[]{6, 7};
+        int[] nums2 = new int[]{6, 0, 4};
+        int[] result = new int[5];
+        un(nums1,nums2,5,result,0,0);
+        System.out.println(Arrays.toString(result));
+    }
+
+    private void test3(){
+        int[] nums1 = new int[]{3, 9};
+        int[] nums2 = new int[]{8, 9};
+        int[] result = new int[3];
+        un(nums1,nums2,3,result,0,0);
+        System.out.println(Arrays.toString(result));
+    }
+
+    public void test(){
+        int[] nums1 = new int[]{3, 4, 6, 5};
+        int[] nums2 = new int[]{9, 1, 2, 5, 8, 3};
+        int[] arr = maxNumber(nums1, nums2, 5);
+        int index = getMaxIndex(nums1,0);
+        System.out.println(index);
+        System.out.println(arr[index]);
     }
 
     public static void main(String[] args) {
         Class321 class321 = new Class321();
-        int[] nums1 = new int[]{3, 4, 6, 5};
-        int[] nums2 = new int[]{9, 1, 2, 5, 8, 3};
-        int[] arr = class321.maxNumber(nums1, nums2, 5);
-        int index = class321.getMaxIndex(nums1,0);
-        System.out.println(index);
-        System.out.println(arr[index]);
-
+//        class321.test1();
+//        class321.test2();
+        class321.test3();
     }
 }
