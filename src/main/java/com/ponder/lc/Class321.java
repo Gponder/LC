@@ -42,6 +42,12 @@ import java.util.Arrays;
  * 来源：力扣（LeetCode）
  * 链接：https://leetcode-cn.com/problems/create-maximum-number
  * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+ *
+ * 找A数组最大值
+ * 找B数组最大值
+ * 比较AB最大值
+ * A>B    A<B     A=B
+ * 校验长度是否合格
  */
 public class Class321 {
     /**
@@ -111,30 +117,42 @@ public class Class321 {
         int indexA = getMaxIndex(nums1, start1);
         int indexB = getMaxIndex(nums2, start2);
         if ((indexA!=-1)&&(indexB==-1 || nums1[indexA]>nums2[indexB])){
-            if (nums1.length-indexA+nums2.length-start2>=0){
-                if (k>0){
-                    result[result.length-k]=nums1[indexA];
-                    un(nums1,nums2,k-1,result,indexA+1,start2);
-                }
-            }else {
-                int[] nums11 = Arrays.copyOf(nums1, nums1.length);
-                nums11[indexA] = -1;
-                un(nums11,nums2,k,result,start1,start2);
-            }
+            a(nums1, nums2, k, result, start1, start2, indexA);
         }else if ((indexB!=-1)&&(indexA==-1||(nums1[indexA]<nums2[indexB]))){
-            if (nums1.length-indexA+nums2.length-start1>=0){
-                if (k>0){
-                    result[result.length-k]=nums2[indexB];
-                    un(nums1,nums2,k-1,result,start1,indexB+1);
-                }
-            }else {
-                int[] nums22 = Arrays.copyOf(nums2,nums2.length);
-                nums22[indexB] = -1;
-                un(nums1,nums22,k,result,start1,start2);
-            }
-        }else{
-
+            b(nums1, nums2, k, result, start1, start2, indexA, indexB);
+        }else if (indexA!=-1&&indexB!=-1&&nums1[indexA]==nums2[indexB]){
+            a(nums1, nums2, k, result, start1, start2, indexA);
         }
+    }
+
+    private void b(int[] nums1, int[] nums2, int k, int[] result, int start1, int start2, int indexA, int indexB) {
+        if (nums1.length-indexA+nums2.length-start1>=0){
+            if (k>0){
+                result[result.length-k]=nums2[indexB];
+                un(nums1,nums2,k-1,result,start1,indexB+1);
+            }
+        }else {
+            int[] nums22 = Arrays.copyOf(nums2,nums2.length);
+            nums22[indexB] = -1;
+            un(nums1,nums22,k,result,start1,start2);
+        }
+    }
+
+    private void a(int[] nums1, int[] nums2, int k, int[] result, int start1, int start2, int indexA) {
+        if (nums1.length-indexA+nums2.length-start2>=0){
+            if (k>0){
+                result[result.length-k]=nums1[indexA];
+                un(nums1,nums2,k-1,result,indexA+1,start2);
+            }
+        }else {
+            int[] nums11 = Arrays.copyOf(nums1, nums1.length);
+            nums11[indexA] = -1;
+            un(nums11,nums2,k,result,start1,start2);
+        }
+    }
+
+    public void aOrB(int[] a,int[] b){
+
     }
 
     public void test1(){
