@@ -50,9 +50,16 @@ import java.util.Arrays;
  * 校验长度是否合格
  */
 public class Class321 {
+
+    private int[] arrA;
+    private int[] arrB;
+
+    public void init(int[] arrA, int[] arrB) {
+        this.arrA = arrA;
+        this.arrB = arrB;
+    }
+
     /**
-     *
-     *
      * @param nums1
      * @param nums2
      * @param k
@@ -62,39 +69,16 @@ public class Class321 {
         return nums1;
     }
 
-    private void findMaxNum(int[] nums1,int start1,int[] nums2,int start2,int[] result,int index){
-        int temp = nums1[start1];
-        boolean flag;
-        for (int i=start1;i<nums1.length;i++){
-            if (temp<nums1[i]){
-                temp = nums1[i];
-                flag = true;
-                start1 = i;
-            }
-        }
-        for (int j=start2;j<nums2.length;j++){
-            if (temp<nums2[j]){
-                temp = nums2[j];
-                flag = false;
-                start2 = j;
-            }
-        }
-        if (nums1.length-start1+nums2.length-start2 >= result.length - index){
-            result[index] = temp;
-            findMaxNum(nums1,start1,nums2,start2,result,index++);
-        }else{
-
-        }
-    }
-
     /**
      *
+     * 递归法 最大值相等时把最大值置为负重新寻找最大值
+     * 深度法 添加深度参数最大值相等时改为找第二大数
      * @param arr
-     * @param index  开始下表
+     * @param index  开始下标
      * @return
      */
     private int getMaxIndex(int[] arr,int index){
-        if (index>=arr.length)return -1;
+        if (index>=arr.length)return index;
         int temp=arr[index];
         for (int i = index;i<arr.length;i++){
             if (temp<arr[i]){
@@ -106,6 +90,11 @@ public class Class321 {
     }
 
     /**
+     * case1
+     * case2
+     *          两个数组中哪个最大用哪个数组最大值,然后判断是否合格不合格取第二大数值
+     * case3
+     *          最大值相等时需判断两种情况是否都合格 并比较两种情况哪个大
      *
      * @param nums1
      * @param nums2
@@ -116,17 +105,28 @@ public class Class321 {
     private void un(int[] nums1, int[] nums2, int k,int[] result,int start1,int start2){
         int indexA = getMaxIndex(nums1, start1);
         int indexB = getMaxIndex(nums2, start2);
-        if ((indexA!=-1)&&(indexB==-1 || nums1[indexA]>nums2[indexB])){
-            a(nums1, nums2, k, result, start1, start2, indexA);
-        }else if ((indexB!=-1)&&(indexA==-1||(nums1[indexA]<nums2[indexB]))){
-            b(nums1, nums2, k, result, start1, start2, indexA, indexB);
-        }else if (indexA!=-1&&indexB!=-1&&nums1[indexA]==nums2[indexB]){
-            a(nums1, nums2, k, result, start1, start2, indexA);
+        if ((indexA!=nums1.length)&&(indexB==nums2.length || nums1[indexA]>nums2[indexB])){
+            a(arrA, arrB, k, result, start1, start2, indexA);
+        }else if ((indexB!=nums2.length)&&(indexA==nums1.length||(nums1[indexA]<nums2[indexB]))){
+            b(arrA, arrB, k, result, start1, start2, indexA, indexB);
+        }else if (indexA!=nums1.length&&indexB!=nums2.length&&nums1[indexA]==nums2[indexB]){
+            aOrB(arrA, arrB, k, result, start1, start2, indexA, indexB);
         }
     }
 
+    /**
+     * 取a数组中的数
+     * @param nums1
+     * @param nums2
+     * @param k
+     * @param result
+     * @param start1
+     * @param start2
+     * @param indexA
+     * @param indexB
+     */
     private void b(int[] nums1, int[] nums2, int k, int[] result, int start1, int start2, int indexA, int indexB) {
-        if (nums1.length-indexA+nums2.length-start1>=0){
+        if (nums1.length-start1+nums2.length-indexB>=k){
             if (k>0){
                 result[result.length-k]=nums2[indexB];
                 un(nums1,nums2,k-1,result,start1,indexB+1);
@@ -138,8 +138,18 @@ public class Class321 {
         }
     }
 
+    /**
+     * 取b数组中的数
+     * @param nums1
+     * @param nums2
+     * @param k
+     * @param result
+     * @param start1
+     * @param start2
+     * @param indexA
+     */
     private void a(int[] nums1, int[] nums2, int k, int[] result, int start1, int start2, int indexA) {
-        if (nums1.length-indexA+nums2.length-start2>=0){
+        if (nums1.length-indexA+nums2.length-start2>=k){
             if (k>0){
                 result[result.length-k]=nums1[indexA];
                 un(nums1,nums2,k-1,result,indexA+1,start2);
@@ -151,13 +161,39 @@ public class Class321 {
         }
     }
 
-    public void aOrB(int[] a,int[] b){
-
+    /**
+     * 相等时如何取
+     *
+     * @param nums1
+     * @param nums2
+     * @param k
+     * @param result
+     * @param start1
+     * @param start2
+     */
+    public void aOrB(int[] nums1, int[] nums2, int k,int[] result,int start1,int start2,int indexA,int indexB){
+        int[] result1 = Arrays.copyOf(result, result.length);
+        int[] result2 = Arrays.copyOf(result, result.length);
+        a(nums1, nums2, k, result1, start1, start2, indexA);
+        b(nums1, nums2, k, result2, start1, start2, indexA, indexB);
+        if (k>1){
+            for (int i=result.length-k+1;i<result.length;i++){
+                if (result1[i]>result2[i]){
+                    System.arraycopy(result1,0,result,0,result.length);
+                    return;
+                }else if (result1[i]<result2[i]){
+                    System.arraycopy(result2,0,result,0,result.length);
+                    return;
+                }
+            }
+        }
+        result=result1;
     }
 
     public void test1(){
         int[] nums1 = new int[]{3, 4, 6, 5};
         int[] nums2 = new int[]{9, 1, 2, 5, 8, 3};
+        init(nums1,nums2);
         int[] result = new int[5];
         try {
             un(nums1,nums2,5,result,0,0);
@@ -170,6 +206,7 @@ public class Class321 {
     private void test2(){
         int[] nums1 = new int[]{6, 7};
         int[] nums2 = new int[]{6, 0, 4};
+        init(nums1,nums2);
         int[] result = new int[5];
         un(nums1,nums2,5,result,0,0);
         System.out.println(Arrays.toString(result));
@@ -178,6 +215,7 @@ public class Class321 {
     private void test3(){
         int[] nums1 = new int[]{3, 9};
         int[] nums2 = new int[]{8, 9};
+        init(nums1,nums2);
         int[] result = new int[3];
         un(nums1,nums2,3,result,0,0);
         System.out.println(Arrays.toString(result));
@@ -194,8 +232,8 @@ public class Class321 {
 
     public static void main(String[] args) {
         Class321 class321 = new Class321();
-//        class321.test1();
-//        class321.test2();
+        class321.test1();
+        class321.test2();
         class321.test3();
     }
 }
